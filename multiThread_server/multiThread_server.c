@@ -26,7 +26,7 @@ int main(int argc, char *argv[]){
     struct sockaddr_in clnt_addr;
     // sockaddr_in은 주소 체계가 ipv4인 AF_INET 인 경우의 소켓주소를 담는 구조체. 
 
-    int clnt_adrr_size;
+    int clnt_addr_size;
     pthread_t t_id;
 
     if(argc != 2) // 추가 인자 하나(port)가 없으면 예외처리.
@@ -59,12 +59,12 @@ int main(int argc, char *argv[]){
         clnt_sock = accept(serv_sock, (struct sockaddr*)&clnt_addr, &clnt_addr_size);
         // accept()로 client가 connect요청한 것을 받음. server socket에 client를 연결. 후 clnt_sock fd에 할당.
 
-        pthread_mutex_locK(&mutx);
+        pthread_mutex_lock(&mutx);
         clnt_socks[clnt_cnt++] = clnt_sock;
-        ptrhead_mutex_unlock(&mutx);
+        pthread_mutex_unlock(&mutx);
 
-        pthread_create(&t_id, NULL, handle_clnt, (void)*&clnt_sock);
-        pthread_detach(t_id);
+        pthread_create(&t_id, NULL, handle_clnt, (void*)&clnt_sock);
+        pthread_detach(t_id); // detach는 thread가 종료되었을 때, 자원 회수를 위한 것.
         printf("Connected client IP: %s \n", inet_ntoa(clnt_addr.sin_addr));
     }
 
